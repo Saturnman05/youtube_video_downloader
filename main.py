@@ -1,10 +1,43 @@
 from pytube import YouTube
+from sys import argv
 from tkinter import *
-from os import path
 
 
-'''Proyecto de YoutubeDownloader versión 1.2'''
+''' Ver 0.1 '''
 def main():
+    try:
+        tipo = argv[1]
+    except IndexError:
+        print('python main.py "consola/ventana"')
+        return 0
+
+    if tipo == "consola":
+        consola()
+    elif tipo == "ventana":
+        ventana()
+
+
+def consola():
+    # python main.py "link"
+    link = input("Link: ")
+    yt = YouTube(link)
+
+    print(f"Título: {yt.title}")
+    print(f"Visitas: {yt.views}")
+
+    yd = yt.streams.get_highest_resolution()
+    # yd = yt.streams.get_lowest_resolution()
+
+    opcion = input("¿Descargar video? ")
+    if opcion.upper() == "S" or opcion.upper() == "SI":
+        print("Cargando...")
+        yd.download("/Users/user/Documents/Descargas de videos")
+        print("Descarga completada")
+    else:
+        print("Adios")
+
+
+def ventana():
     # Create Display Window
     root = Tk()
     root.resizable(width=False, height=False)
@@ -32,16 +65,9 @@ def main():
     # Variable to store user entered link
     link = StringVar()
 
-    # Download directory
-    directorio_principal = path.expanduser("~")
-    carpeta_descargas = path.join(directorio_principal, "Downloads")
-
     # Create an entry field which accepts link from user
     enter_link = Entry(root, width=70, textvariable=link)
     enter_link.place(x=50, y=100)
-
-    # Create an entry field for the directory
-    # directory_for_download = "/Users/user/Documents/Descargas de videos"
 
     # Create a field to write the title and views of the video
     lbl_width = 52
@@ -50,7 +76,6 @@ def main():
 
     views_lbl = Label(root, width=lbl_width, text="Views info", font="arial 10 bold", bg="blue", fg="white")
     views_lbl.place(x=50, y=150)
-
 
     # Function to get the title and views of the video
     def get_info():
@@ -63,24 +88,21 @@ def main():
         title_lbl.config(text=f"Title: {title}", anchor='w')
         views_lbl.config(text=f"Views: {views}")
 
-    # Restart the display label
-    display = Label(root, text='', )
-    display.place(x=215, y=410)
-
     # Function to download the user entered link
     def downloader():
+        # Restart the display label
+        display = Label(root, text='')
+        display.place(x=215, y=390)
         # Getting the user entered link and assigning it to YouTube class ini pytube
         url = YouTube(str(link.get()))
         # Returns the highest definition element in list of video formats
         video = url.streams.get_highest_resolution()
+        # This is the directory where the video will be downloaded
+        directory_for_download = "/Users/user/Documents/Descargas de videos"
         # The download starts here
-        video.download(carpeta_descargas)
+        video.download(directory_for_download)
         # To acknowledge user that the video has downloaded after it's completion
         display.config(text='Downloaded')
-
-    # Function to clear de downloaded label
-    def clear():
-        display.config(text='')
 
     # Button to get the info of the video
     get_info_btn = Button(root, text='Get Info', command=get_info, fg='white', bg='black')
@@ -89,10 +111,6 @@ def main():
     # Button to start the downloading the video of provided url
     download_btn = Button(root, text='Download', command=downloader, fg='white', bg='black')
     download_btn.place(x=150, y=360)
-
-    # Button to clear the downloaded text
-    clear_btn = Button(root, text='Clear', command=clear, fg='white', bg='black')
-    clear_btn.place(x=350, y=360)
 
     # To start the interface and display the properties in it
     mainloop()
