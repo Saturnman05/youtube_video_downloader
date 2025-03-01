@@ -1,4 +1,5 @@
-from pytube import YouTube
+from pytube import YouTube, Stream
+from pytube.exceptions import PytubeError
 from sys import argv
 from tkinter import *
 
@@ -17,21 +18,25 @@ def main():
         ventana()
 
 
-def consola():
+def consola() -> None:
     # python main.py "link"
-    link = input("Link: ")
+    link: str = input("Link: ")
     yt = YouTube(link)
 
-    print(f"Título: {yt.title}")
-    print(f"Visitas: {yt.views}")
+    try:
+        print(f"Título: {yt.title}")
+        print(f"Visitas: {yt.views}")
+    except PytubeError:
+        print("Error con la api de youtube")
+        return
 
-    yd = yt.streams.get_highest_resolution()
+    yd: Stream = yt.streams.get_highest_resolution()
     # yd = yt.streams.get_lowest_resolution()
 
-    opcion = input("¿Descargar video? ")
+    opcion = input("¿Descargar video?[S/N] ")
     if opcion.upper() == "S" or opcion.upper() == "SI":
         print("Cargando...")
-        yd.download("/Users/user/Documents/Descargas de videos")
+        yd.download("/Users/franc/Documents/Descargas-de-videos")
         print("Descarga completada")
     else:
         print("Adios")
